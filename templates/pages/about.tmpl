@@ -1,0 +1,11 @@
+{{ template "base" . }}
+
+{{ define "title" }}About{{ end }}
+
+{{ define "content" }}
+<h2>About</h2>
+<button hx-get="/app/_htmx/snippet"
+        hx-target="#thing"
+        hx-swap="outerHTML">Do htmx magic!</button>
+<p id="thing">Swap this thing</p>
+{{ end }}
