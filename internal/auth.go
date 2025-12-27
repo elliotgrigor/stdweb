@@ -1,13 +1,13 @@
-package main
+package internal
 
 const (
-	devAuthN = true
-	devAuthZ = true
+	devAuthenticated = true
+	devAuthorized    = true
 )
 
 func isAuthenticated() bool {
 	if devMode {
-		return devAuthN
+		return devAuthenticated
 	}
 	// TODO: Implement authentication logic
 	return false
@@ -15,7 +15,7 @@ func isAuthenticated() bool {
 
 func isAuthorised() bool {
 	if devMode {
-		return devAuthZ
+		return devAuthorized
 	}
 	// TODO: Implement authorisation logic
 	return false

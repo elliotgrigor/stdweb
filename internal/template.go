@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"html/template"
@@ -18,8 +18,8 @@ const (
 
 var templateCache = map[string]*template.Template{}
 
-func createCacheKey(strip, templatePath string) string {
-	key := strings.TrimPrefix(strip, templatePath)
+func createCacheKey(fullPath, templateDirPath string) string {
+	key := strings.TrimPrefix(fullPath, templateDirPath)
 	key = strings.TrimSuffix(key, templateFileExtension)
 	return key
 }
@@ -51,9 +51,11 @@ func tmplRender(w http.ResponseWriter, tmplName string, data any) {
 	if devMode {
 		cacheBuilder() // DEV: Hot template reloading in development mode
 	}
-	if err := templateCache[tmplName].Execute(w, data); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Error 500: Internal Server Error"))
+	err := templateCache[tmplName].Execute(w, data)
+	if err != nil {
+		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
+		log.Println("Error: Failed to build template cache:", err.Error())
+		return
 	}
 }
 

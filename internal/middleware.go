@@ -1,11 +1,11 @@
-package main
+package internal
 
 import (
 	"log"
 	"net/http"
 )
 
-func loggerMiddleware(next http.Handler) http.Handler {
+func LoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// TODO: Log to a file
 		log.Println(r.RemoteAddr, r.Method, r.URL.Path)
@@ -13,23 +13,20 @@ func loggerMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func authMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isAuthenticated() && isAuthorised() {
 			next.ServeHTTP(w, r)
 			return
 		}
 		if !isAuthenticated() {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Error 401: Unauthorized"))
+			http.Error(w, "Error 401: Unauthorized", http.StatusInternalServerError)
 			return
 		}
 		if !isAuthorised() {
-			w.WriteHeader(http.StatusForbidden)
-			w.Write([]byte("Error 403: Forbidden"))
+			http.Error(w, "Error 403: Forbidden", http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Error 500: Internal Server Error"))
+		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
 	})
 }
